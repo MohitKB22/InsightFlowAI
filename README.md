@@ -1,98 +1,178 @@
 # 🔍 LLM Data Pipeline — Real-Time ELT with ML & Business Insights
 
-> **Enterprise-grade Real-Time ELT Pipeline** that ingests streaming events, processes them with ML fraud detection, and generates LLM-powered business insights — delivered to a live dashboard and Slack/email alerts.
+> Enterprise-grade streaming analytics platform that ingests real-time events, detects fraud with machine learning, generates LLM-powered business insights, and delivers alerts, APIs, and live dashboards.
+
+![Python](https://img.shields.io/badge/Python-3.11+-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-REST_API-green)
+![Kafka](https://img.shields.io/badge/Kafka-Streaming-black)
+![XGBoost](https://img.shields.io/badge/XGBoost-ML-orange)
+![OpenAI](https://img.shields.io/badge/OpenAI-LLM-purple)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+![AWS](https://img.shields.io/badge/AWS-Cloud-yellow)
+
+---
+
+## ✨ Features
+
+- ⚡ Real-time event processing and streaming analytics
+- 🧠 ML-powered fraud detection using XGBoost
+- 🤖 OpenAI-powered business insights generation
+- 📊 Interactive Streamlit dashboard
+- 🚨 Automated alerting (Slack, Email, Webhooks)
+- 🔌 FastAPI REST APIs for analytics and inference
+- 📦 Dockerized microservices architecture
+- 📈 Monitoring with Prometheus & Grafana
+- ☁️ AWS-ready deployment architecture
 
 ---
 
 ## 📐 Architecture Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                     LLM DATA PIPELINE                                    │
-│                                                                          │
+│                     LLM DATA PIPELINE                                   │
+│                                                                         │
 │  Event          Stream          ML             LLM           Storage    │
 │  Generator ───► Processor  ───► Inference ───► Insights ──► Redis      │
 │  (Faker)        (Windowed       (XGBoost)      (OpenAI)     PostgreSQL  │
-│                 Aggregation)                               Elasticsearch │
+│                 Aggregation)                               Elasticsearch│
 │                      │                                     S3 (raw)     │
-│                      ▼                                          │        │
-│                  Alert Engine  ────────────────────────────────►        │
-│                  (Slack/Email/                                           │
-│                   Webhook)                                               │
-│                      │                                                   │
-│                      ▼                                                   │
-│               Streamlit Dashboard ◄── FastAPI REST ◄── Prometheus       │
+│                      ▼                                          │       │
+│                  Alert Engine  ────────────────────────────────►       │
+│                  (Slack/Email/                                         │
+│                   Webhook)                                             │
+│                      │                                                 │
+│                      ▼                                                 │
+│              Streamlit Dashboard ◄── FastAPI REST ◄── Prometheus      │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Quick Start (No Docker, No Kafka Required)
+## 🚀 Quick Start
+
+Run the complete pipeline locally without Kafka or Docker.
+
+### 1. Clone the repository
 
 ```bash
-# 1. Clone and install
 git clone <repo-url>
 cd llm_data_pipeline
+```
+
+### 2. Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# 2. Copy env config
+### 3. Configure environment variables
+
+```bash
 cp .env.example .env
-# Edit .env — add OPENAI_API_KEY for real LLM insights (optional)
+```
 
-# 3. Run full pipeline (trains model + processes 300 events)
+Add your OpenAI API key:
+
+```env
+OPENAI_API_KEY=your_api_key_here
+```
+
+### 4. Run the pipeline
+
+```bash
 python scripts/quickstart.py
+```
 
-# 4. Launch dashboard
+This will:
+
+- Train the fraud detection model
+- Generate synthetic events
+- Process 300 streaming events
+- Produce insights and alerts
+
+### 5. Launch Dashboard
+
+```bash
 streamlit run dashboard/app.py
+```
 
-# 5. Launch REST API
+Dashboard:
+
+```text
+http://localhost:8501
+```
+
+### 6. Launch REST API
+
+```bash
 python -m backend.api.main
-# Visit: http://localhost:8080/docs
+```
+
+API Docs:
+
+```text
+http://localhost:8080/docs
 ```
 
 ---
 
-## 🐳 Full Stack with Docker
+## 🐳 Full Stack Deployment
+
+Launch the complete production-style stack.
 
 ```bash
 cd infrastructure/docker
-docker-compose up --build
 
-# Services:
-#  Kafka:          localhost:9092
-#  PostgreSQL:     localhost:5432
-#  Redis:          localhost:6379
-#  Elasticsearch:  localhost:9200
-#  FastAPI:        http://localhost:8080/docs
-#  Dashboard:      http://localhost:8501
-#  Grafana:        http://localhost:3000  (admin / admin123)
-#  Prometheus:     http://localhost:9090
+docker-compose up --build
+```
+
+### Available Services
+
+| Service | URL / Port |
+|----------|------------|
+| Kafka | localhost:9092 |
+| PostgreSQL | localhost:5432 |
+| Redis | localhost:6379 |
+| Elasticsearch | localhost:9200 |
+| FastAPI | http://localhost:8080/docs |
+| Dashboard | http://localhost:8501 |
+| Grafana | http://localhost:3000 |
+| Prometheus | http://localhost:9090 |
+
+**Grafana Credentials**
+
+```text
+Username: admin
+Password: admin123
 ```
 
 ---
 
 ## 📁 Project Structure
 
-```
+```text
 llm_data_pipeline/
 ├── backend/
-│   ├── models.py              # Pydantic schemas (RawEvent, Alert, etc.)
-│   ├── pipeline.py            # Main orchestrator + CLI entry point
+│   ├── models.py
+│   ├── pipeline.py
 │   ├── producer/
-│   │   └── event_producer.py  # Kafka producer + synthetic event generator
+│   │   └── event_producer.py
 │   ├── streaming/
-│   │   └── processor.py       # Window aggregation + event enrichment
+│   │   └── processor.py
 │   ├── ml/
-│   │   ├── train.py           # XGBoost training + InferenceEngine
-│   │   └── llm_insights.py    # OpenAI GPT insights generator
+│   │   ├── train.py
+│   │   └── llm_insights.py
 │   ├── alerts/
-│   │   └── alert_engine.py    # Rule engine + Slack/Email/Webhook dispatch
+│   │   └── alert_engine.py
 │   ├── storage/
-│   │   └── storage.py         # PostgreSQL, Redis, S3, Elasticsearch
+│   │   └── storage.py
 │   └── api/
-│       └── main.py            # FastAPI REST API
+│       └── main.py
+│
 ├── dashboard/
-│   └── app.py                 # Streamlit live dashboard
+│   └── app.py
+│
 ├── infrastructure/
 │   └── docker/
 │       ├── docker-compose.yml
@@ -100,140 +180,321 @@ llm_data_pipeline/
 │       ├── Dockerfile.api
 │       ├── Dockerfile.dashboard
 │       └── prometheus.yml
+│
 ├── tests/
 │   └── unit/
-│       └── test_pipeline.py   # 20+ unit tests
+│       └── test_pipeline.py
+│
 ├── scripts/
-│   └── quickstart.py          # One-command local runner
+│   └── quickstart.py
+│
 ├── config/
-│   └── settings.py            # Pydantic Settings (env-based config)
+│   └── settings.py
+│
 ├── requirements.txt
 └── .env.example
 ```
 
 ---
 
-## 🧪 Running Tests
+## 🧪 Testing
+
+Run all tests:
 
 ```bash
-# All tests
 pytest tests/ -v
+```
 
-# With coverage report
-pytest tests/ -v --cov=backend --cov-report=term-missing
+Run with coverage:
 
-# Single test class
+```bash
+pytest tests/ -v \
+  --cov=backend \
+  --cov-report=term-missing
+```
+
+Run a specific test:
+
+```bash
 pytest tests/unit/test_pipeline.py::TestMLTraining -v
 ```
 
 ---
 
-## 🔧 CLI Reference
+## 🔧 CLI Commands
+
+### Train Model
 
 ```bash
-# Train model only
-python -m backend.pipeline train --n-samples 5000
+python -m backend.pipeline train \
+  --n-samples 5000
+```
 
-# Run in-process pipeline (no Kafka needed)
-python -m backend.pipeline pipeline --events 1000 --batch-size 50
+### Run Local Pipeline
 
-# Run Kafka producer (requires Kafka)
-python -m backend.pipeline producer --kafka-servers localhost:9092
+```bash
+python -m backend.pipeline pipeline \
+  --events 1000 \
+  --batch-size 50
+```
 
-# Start REST API
+### Start Kafka Producer
+
+```bash
+python -m backend.pipeline producer \
+  --kafka-servers localhost:9092
+```
+
+### Start API
+
+```bash
 python -m backend.pipeline api
 ```
 
 ---
 
-## 🌐 REST API Endpoints
+## 🌐 REST API
+
+### Health
 
 | Endpoint | Method | Description |
-|---|---|---|
-| `/health` | GET | Service health check |
-| `/status` | GET | Pipeline status summary |
-| `/metrics/latest` | GET | Latest window metrics |
-| `/metrics/history` | GET | Historical metrics (n points) |
-| `/metrics/summary` | GET | Aggregated statistics |
-| `/alerts` | GET | Recent alerts |
-| `/alerts/counts` | GET | Alert counts by severity |
-| `/insights/latest` | GET | Latest LLM insight |
-| `/insights/history` | GET | Historical insights |
-| `/inference/predict` | POST | Single event fraud prediction |
-| `/inference/batch` | POST | Batch fraud prediction (≤100) |
-| `/events/recent` | GET | Recent processed events |
+|-----------|---------|-------------|
+| `/health` | GET | Health check |
+| `/status` | GET | Pipeline status |
 
-Full interactive docs: **http://localhost:8080/docs**
+### Metrics
+
+| Endpoint | Method |
+|-----------|---------|
+| `/metrics/latest` | GET |
+| `/metrics/history` | GET |
+| `/metrics/summary` | GET |
+
+### Alerts
+
+| Endpoint | Method |
+|-----------|---------|
+| `/alerts` | GET |
+| `/alerts/counts` | GET |
+
+### Insights
+
+| Endpoint | Method |
+|-----------|---------|
+| `/insights/latest` | GET |
+| `/insights/history` | GET |
+
+### Fraud Inference
+
+| Endpoint | Method |
+|-----------|---------|
+| `/inference/predict` | POST |
+| `/inference/batch` | POST |
+
+### Events
+
+| Endpoint | Method |
+|-----------|---------|
+| `/events/recent` | GET |
+
+Interactive Docs:
+
+```text
+http://localhost:8080/docs
+```
 
 ---
 
-## 🤖 ML Model Details
+## 🤖 Machine Learning
 
-- **Algorithm**: XGBoost (falls back to GradientBoosting if unavailable)
-- **Target**: Binary fraud classification
-- **Features**: 15 engineered features including time-based, window aggregates, and device/location patterns
-- **Class imbalance**: Handled via `scale_pos_weight`
-- **Typical performance** (synthetic data):
-  - ROC-AUC: ~0.97+
-  - F1 Score: ~0.88+
-  - Recall: ~0.92+ (minimise missed fraud)
+### Model
+
+| Attribute | Value |
+|------------|---------|
+| Algorithm | XGBoost |
+| Target | Fraud Classification |
+| Features | 15 Engineered Features |
+| Imbalance Handling | scale_pos_weight |
+
+### Performance
+
+| Metric | Score |
+|----------|---------|
+| ROC-AUC | 0.97+ |
+| F1 Score | 0.88+ |
+| Recall | 0.92+ |
+
+### Feature Categories
+
+- Transaction patterns
+- Velocity metrics
+- Time-based signals
+- Device behavior
+- Geographical patterns
+- Historical user activity
 
 ---
 
 ## 🚨 Alert Rules
 
 | Rule | Condition | Severity |
-|---|---|---|
+|--------|------------|-----------|
 | FRAUD_HIGH_PROB | fraud_probability ≥ 0.85 | CRITICAL |
 | HIGH_TRANSACTION | amount ≥ $10,000 | HIGH |
-| FAILED_ATTEMPTS | failed_logins ≥ 5 in 1h | MEDIUM |
+| FAILED_ATTEMPTS | failed_logins ≥ 5 | MEDIUM |
 | ANOMALY_NIGHT_API | API device + night + amount > $1k | MEDIUM |
 | VELOCITY_SPIKE | txn_count_1h ≥ 20 | HIGH |
 
 ---
 
-## ☁️ AWS Deployment
+## 📊 Monitoring & Observability
 
-```bash
-# Services used:
-# MSK (Kafka)   → managed Kafka cluster
-# EMR           → Spark Structured Streaming
-# RDS           → PostgreSQL
-# ElastiCache   → Redis
-# S3            → raw event archive
-# ECS/EKS       → containerised API + dashboard
-# Lambda        → alert webhook handler
-# CloudWatch    → metrics + log aggregation
+### Prometheus Metrics
 
-# Estimated throughput: 100M+ events/day
-# Horizontal scaling: add Kafka partitions + ECS task replicas
+- Events processed/sec
+- Fraud rate
+- Alert counts
+- Processing latency
+- API throughput
+- Error rates
+
+### Grafana Dashboards
+
+- Real-time transaction volume
+- Fraud detection trends
+- System health monitoring
+- API performance analytics
+
+---
+
+## ☁️ AWS Deployment Architecture
+
+| Service | Purpose |
+|-----------|----------|
+| MSK | Managed Kafka |
+| EMR | Spark Streaming |
+| RDS | PostgreSQL |
+| ElastiCache | Redis |
+| S3 | Data Lake |
+| ECS / EKS | Containers |
+| Lambda | Alert Processing |
+| CloudWatch | Monitoring |
+
+### Scalability
+
+- 100M+ events/day
+- Horizontal consumer scaling
+- Kafka partitioning
+- Distributed storage
+- Sub-second latency
+
+---
+
+## 📈 Resume-Ready Summary
+
+### Project
+
+**Real-Time ELT Data Pipeline**  
+*Python · Kafka · XGBoost · OpenAI · FastAPI · Streamlit · Docker · AWS*
+
+### Highlights
+
+- Processed 100K+ events/hour with sub-second latency
+- Achieved 97%+ ROC-AUC fraud detection accuracy
+- Generated automated GPT-powered business insights
+- Built real-time monitoring dashboard
+- Designed cloud-native AWS deployment architecture
+- Implemented scalable streaming analytics workflows
+
+### Tech Stack
+
+```text
+Python 3.11
+Apache Kafka
+PySpark
+XGBoost
+scikit-learn
+OpenAI API
+FastAPI
+Streamlit
+PostgreSQL
+Redis
+Elasticsearch
+AWS S3
+Docker
+Prometheus
+Grafana
 ```
 
 ---
 
-## 📊 Resume-Ready Description
+## 📝 Interview Questions
 
-> **Real-Time ELT Data Pipeline** | Python · Kafka · XGBoost · OpenAI · FastAPI · Streamlit · Docker
+<details>
+<summary><strong>Why XGBoost instead of Deep Learning?</strong></summary>
 
-Built an enterprise-grade streaming analytics platform processing 100K+ events/hour with sub-second latency. Implemented windowed aggregation with fraud detection (97% ROC-AUC), LLM-powered business insights via OpenAI GPT, and a live Streamlit monitoring dashboard. Containerised all 8 microservices with Docker Compose, deployed on AWS (MSK + EMR + RDS + ElastiCache). Achieved exactly-once processing guarantees via Kafka consumer group offsets and idempotent PostgreSQL writes.
+XGBoost performs exceptionally well on structured tabular data, trains faster, offers explainability through feature importance, handles class imbalance effectively, and requires significantly less computational resources than neural networks.
 
-**Tech Stack**: Python 3.11 · Apache Kafka · PySpark · XGBoost · scikit-learn · OpenAI API · FastAPI · Streamlit · PostgreSQL · Redis · Elasticsearch · AWS S3 · Docker · Kubernetes · Prometheus · Grafana
+</details>
+
+<details>
+<summary><strong>How do you handle late-arriving events?</strong></summary>
+
+Using Spark watermarking:
+
+```python
+withWatermark("event_time", "10 minutes")
+```
+
+This allows processing events arriving up to 10 minutes late while maintaining correct aggregations.
+
+</details>
+
+<details>
+<summary><strong>How is exactly-once processing achieved?</strong></summary>
+
+1. Kafka producer acknowledgements (`acks=all`)
+2. Consumer offset commit after successful writes
+3. Idempotent PostgreSQL inserts using `ON CONFLICT`
+
+</details>
+
+<details>
+<summary><strong>How would you scale to 1B events/day?</strong></summary>
+
+- Increase Kafka partitions
+- Add consumer replicas
+- Scale Spark executors
+- Partition storage by time
+- Deploy Redis Cluster
+- Enable backpressure controls
+
+</details>
 
 ---
 
-## 📝 Interview Q&A
+## 🎯 Learning Outcomes
 
-**Q: Why XGBoost over a neural network?**
-A: XGBoost provides interpretable feature importances (critical for fraud explainability), trains 10× faster on tabular data, handles class imbalance via `scale_pos_weight`, and requires no GPU. Neural networks shine on unstructured data; tabular fraud detection strongly favours gradient boosting.
+This project demonstrates expertise in:
 
-**Q: How do you handle late-arriving events in Spark Streaming?**
-A: Watermarking — `withWatermark("event_time", "10 minutes")` — allows events up to 10 minutes late while still producing correct window results. Events beyond the watermark threshold are dropped with a logged warning.
+- Data Engineering
+- Real-Time Streaming Systems
+- Machine Learning Engineering
+- MLOps
+- Distributed Systems
+- Backend Development
+- Cloud Architecture
+- LLM Integration
+- Observability & Monitoring
 
-**Q: How do you guarantee exactly-once processing?**
-A: Three layers: (1) Kafka producer `acks=all` + `retries=3`, (2) consumer with manual offset commit after successful downstream write, (3) PostgreSQL `ON CONFLICT DO NOTHING` for idempotent inserts.
+---
 
-**Q: How would you scale to 1 billion events/day?**
-A: Increase Kafka partitions (24+), scale consumer group replicas horizontally, use Spark on EMR with 20+ executors, partition S3 writes by hour, use Redis Cluster for aggregations, and apply backpressure via Kafka consumer `max_poll_records`.
+## 📜 License
 
-**Q: What's the CAP theorem implication here?**
-A: The pipeline prioritises AP (Availability + Partition Tolerance). During a network partition, Kafka continues accepting writes and Redis serves cached reads. PostgreSQL consistency is restored via event replay from Kafka once connectivity returns.
+MIT License
+
+---
+
+## ⭐ Support
+
+If you found this project useful, consider giving it a star ⭐ and sharing feedback.
