@@ -1,0 +1,41 @@
+# ─────────────────────────────────────────────
+# Base image — Python 3.11 slim
+# ─────────────────────────────────────────────
+FROM python:3.11-slim AS base
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# ─────────────────────────────────────────────
+# Dependency layer (cached)
+# ─────────────────────────────────────────────
+FROM base AS deps
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip \
+ && pip install --no-cache-dir -r requirements.txt
+
+# ─────────────────────────────────────────────
+# Application layer
+# ─────────────────────────────────────────────
+FROM deps AS pipeline
+
+COPY . .
+
+# Pre-train the model at build time so the container starts faster
+RUN python -m backend.ml.train || echo "Model pre-training skipped"
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    LOG_LEVEL=INFO
+
+EXPOSE 8000
+
+# Default: run the in-process pipeline
+CMD ["python", "-m", "backend.pipeline", "pipeline", "--events", "1000"]
